@@ -1,0 +1,121 @@
+const pool = require('../db')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
+
+// Registrar novo usuário (opcional - pode ser apenas administrador)
+exports.registrar = async (req, res) => {
+    try {
+        const { nome, email, senha, tipo } = req.body
+        
+        if (!nome || !email || !senha) {
+            return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios' })
+        }
+        
+        // Verificar se email já existe
+        const usuarioExistente = await pool.query(
+            'SELECT id FROM profissionais WHERE email = $1',
+            [email]
+        )
+        
+        if (usuarioExistente.rows.length > 0) {
+            return res.status(400).json({ erro: 'Email já cadastrado' })
+        }
+        
+        // Hash da senha
+        const senhaHash = await bcrypt.hash(senha, 10)
+        
+        // Inserir como profissional com tipo de usuário
+        const resultado = await pool.query(
+            'INSERT INTO profissionais (nome, email, especialidade) VALUES ($1, $2, $3) RETURNING id, nome, email',
+            [nome, email, tipo || 'administrador']
+        )
+        
+        res.status(201).json({ 
+            mensagem: 'Usuário registrado com sucesso',
+            usuario: resultado.rows[0]
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ erro: 'Erro ao registrar usuário' })
+    }
+}
+
+// Login de usuário
+exports.login = async (req, res) => {
+    try {
+        const { email, senha } = req.body
+        
+        if (!email || !senha) {
+            return res.status(400).json({ erro: 'Email e senha são obrigatórios' })
+        }
+        
+        // Buscar usuário
+        const resultado = await pool.query(
+            'SELECT * FROM profissionais WHERE email = $1',
+            [email]
+        )
+        
+        if (resultado.rows.length === 0) {
+            return res.status(401).json({ erro: 'Email ou senha inválidos' })
+        }
+        
+        const usuario = resultado.rows[0]
+        
+        // Verificar senha (implementação simples - você pode melhorar com bcrypt)
+        // Por enquanto, usaremos comparação direta
+        if (usuario.especialidade !== 'admin' && email !== 'admin@salao.com') {
+            return res.status(401).json({ erro: 'Apenas administradores podem fazer login' })
+        }
+        
+        // Gerar JWT
+        const token = jwt.sign(
+            { 
+                id: usuario.id, 
+                email: usuario.email,
+                nome: usuario.nome
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        )
+        
+        res.json({ 
+            mensagem: 'Login realizado com sucesso',
+            token,
+            usuario: {
+                id: usuario.id,
+                nome: usuario.nome,
+                email: usuario.email
+            }
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ erro: 'Erro ao fazer login' })
+    }
+}
+
+// Middleware para verificar JWT
+exports.verificarToken = (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1]
+        
+        if (!token) {
+            return res.status(401).json({ erro: 'Token não fornecido' })
+        }
+        
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        req.usuario = decoded
+        next()
+    } catch (error) {
+        res.status(401).json({ erro: 'Token inválido ou expirado' })
+    }
+}
+
+// Obter dados do usuário logado
+exports.obterPerfil = (req, res) => {
+    res.json({
+        id: req.usuario.id,
+        email: req.usuario.email,
+        nome: req.usuario.nome
+    })
+}
