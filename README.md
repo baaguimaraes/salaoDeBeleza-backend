@@ -49,7 +49,7 @@ Backend de um sistema de gerenciamento de salão de beleza com funcionalidades d
    DB_PORT=5432
    DB_NAME=salao_de_beleza
    JWT_SECRET=sua_chave_super_secreta
-   PORT=3000
+   PORT=3002
    ```
 
 5. **Inicie o servidor**
@@ -181,13 +181,13 @@ Teste a API usando Postman ou cURL:
 
 ```bash
 # Health check
-curl http://localhost:3000/health
+curl http://localhost:3002/health
 
 # Listar clientes
-curl http://localhost:3000/clientes
+curl http://localhost:3002/clientes
 
 # Criar cliente
-curl -X POST http://localhost:3000/clientes \
+curl -X POST http://localhost:3002/clientes \
   -H "Content-Type: application/json" \
   -d '{"nome":"Test","telefone":"123456","email":"test@test.com"}'
 ```

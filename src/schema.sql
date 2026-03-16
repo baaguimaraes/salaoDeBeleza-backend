@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS profissionais (
     especialidade VARCHAR(100) NOT NULL,
     descricao TEXT,
     foto_url VARCHAR(500),
+    senha VARCHAR(16) NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT TRUE
 );

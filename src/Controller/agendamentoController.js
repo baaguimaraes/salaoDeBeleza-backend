@@ -1,6 +1,6 @@
 const pool = require('../db')
 
-// Listar todos os agendamentos
+
 exports.listarAgendamentos = async (req, res) => {
     try {
         const resultado = await pool.query(`
@@ -18,7 +18,7 @@ exports.listarAgendamentos = async (req, res) => {
     }
 }
 
-// Buscar agendamento por ID
+
 exports.buscarAgendamentoPorId = async (req, res) => {
     try {
         const { id } = req.params
@@ -42,7 +42,7 @@ exports.buscarAgendamentoPorId = async (req, res) => {
     }
 }
 
-// Listar agendamentos de um cliente
+
 exports.agendamentosCliente = async (req, res) => {
     try {
         const { cliente_id } = req.params
@@ -61,7 +61,7 @@ exports.agendamentosCliente = async (req, res) => {
     }
 }
 
-// Listar agendamentos de um profissional
+
 exports.agendamentosProfissional = async (req, res) => {
     try {
         const { profissional_id } = req.params
@@ -80,23 +80,23 @@ exports.agendamentosProfissional = async (req, res) => {
     }
 }
 
-// Criar novo agendamento
+
 exports.criarAgendamento = async (req, res) => {
     try {
         const { cliente_id, profissional_id, data_agendamento, duracao_minutos, servico, observacoes } = req.body
         
-        // Validação básica
+        
         if (!cliente_id || !profissional_id || !data_agendamento || !servico) {
             return res.status(400).json({ erro: 'Campo obrigatório faltando' })
         }
         
-        // Verificar se cliente existe
+       
         const cliente = await pool.query('SELECT id FROM clientes WHERE id = $1', [cliente_id])
         if (cliente.rows.length === 0) {
             return res.status(404).json({ erro: 'Cliente não encontrado' })
         }
         
-        // Verificar se profissional existe
+        
         const profissional = await pool.query('SELECT id FROM profissionais WHERE id = $1', [profissional_id])
         if (profissional.rows.length === 0) {
             return res.status(404).json({ erro: 'Profissional não encontrado' })
@@ -117,7 +117,7 @@ exports.criarAgendamento = async (req, res) => {
     }
 }
 
-// Atualizar agendamento
+
 exports.atualizarAgendamento = async (req, res) => {
     try {
         const { id } = req.params
@@ -142,7 +142,7 @@ exports.atualizarAgendamento = async (req, res) => {
     }
 }
 
-// Cancelar agendamento
+
 exports.cancelarAgendamento = async (req, res) => {
     try {
         const { id } = req.params

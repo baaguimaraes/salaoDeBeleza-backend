@@ -16,6 +16,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.post('/auth/login', authController.login)
+app.post('/auth/registar', authController.registrar)
 app.post('/auth/perfil', authController.verificarToken, authController.obterPerfil)
 app.get('/clientes', clienteController.listarClientes)
 app.get('/clientes/:id', clienteController.buscarClientePorId)
@@ -52,7 +53,7 @@ app.use((req, res) => {
     res.status(404).json({ erro: 'Rota não encontrada' })
 })
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3002
 app.listen(PORT, () => {
     console.log(`✅ Servidor rodando na porta ${PORT}`)
     console.log(`🗄️  Conectado ao banco de dados: Neon`)

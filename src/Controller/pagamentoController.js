@@ -1,6 +1,6 @@
 const pool = require('../db')
 
-// Listar todos os pagamentos
+
 exports.listarPagamentos = async (req, res) => {
     try {
         const resultado = await pool.query(`
@@ -17,7 +17,7 @@ exports.listarPagamentos = async (req, res) => {
     }
 }
 
-// Buscar pagamento por ID
+
 exports.buscarPagamentoPorId = async (req, res) => {
     try {
         const { id } = req.params
@@ -40,7 +40,7 @@ exports.buscarPagamentoPorId = async (req, res) => {
     }
 }
 
-// Buscar pagamento por agendamento
+
 exports.pagamentoPorAgendamento = async (req, res) => {
     try {
         const { agendamento_id } = req.params
@@ -56,23 +56,23 @@ exports.pagamentoPorAgendamento = async (req, res) => {
     }
 }
 
-// Criar novo pagamento
+
 exports.criarPagamento = async (req, res) => {
     try {
         const { agendamento_id, valor, metodo_pagamento, descricao } = req.body
         
-        // Validação básica
+       
         if (!agendamento_id || !valor || !metodo_pagamento) {
             return res.status(400).json({ erro: 'Campo obrigatório faltando' })
         }
         
-        // Verificar se agendamento existe
+       
         const agendamento = await pool.query('SELECT id FROM agendamentos WHERE id = $1', [agendamento_id])
         if (agendamento.rows.length === 0) {
             return res.status(404).json({ erro: 'Agendamento não encontrado' })
         }
         
-        // Validar métodos de pagamento aceitos
+       
         const metodosValidos = ['dinheiro', 'cartao_credito', 'cartao_debito', 'pix']
         if (!metodosValidos.includes(metodo_pagamento)) {
             return res.status(400).json({ erro: 'Método de pagamento inválido' })
@@ -93,7 +93,7 @@ exports.criarPagamento = async (req, res) => {
     }
 }
 
-// Confirmar pagamento
+
 exports.confirmarPagamento = async (req, res) => {
     try {
         const { id } = req.params
@@ -118,7 +118,7 @@ exports.confirmarPagamento = async (req, res) => {
     }
 }
 
-// Cancelar pagamento
+
 exports.cancelarPagamento = async (req, res) => {
     try {
         const { id } = req.params
@@ -142,7 +142,7 @@ exports.cancelarPagamento = async (req, res) => {
     }
 }
 
-// Listar pagamentos por status
+
 exports.pagamentosPorStatus = async (req, res) => {
     try {
         const { status } = req.params
