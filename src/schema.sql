@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS profissionais (
     especialidade VARCHAR(100) NOT NULL,
     descricao TEXT,
     foto_url VARCHAR(500),
-    senha VARCHAR(16) NOT NULL,
+    senha VARCHAR(255),
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ativo BOOLEAN DEFAULT TRUE
 );
@@ -52,6 +52,11 @@ CREATE TABLE IF NOT EXISTS pagamentos (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id) ON DELETE CASCADE
 );
+
+-- Admin padrão (email: admin@salao.com / senha: admin123)
+INSERT INTO profissionais (nome, email, telefone, especialidade, senha)
+VALUES ('Administrador', 'admin@salao.com', '00000000000', 'admin', '$2a$10$D2BW6nC/IRtTlxRkOnsaa.zPF2zzg3jD3ZCbk3r93WnbvrOacuj8i')
+ON CONFLICT (email) DO NOTHING;
 
 -- Criando índices para melhorar performance
 CREATE INDEX IF NOT EXISTS idx_agendamentos_cliente ON agendamentos(cliente_id);

@@ -55,8 +55,17 @@ app.use((req, res) => {
 })
 
 const PORT = process.env.PORT || 3002
-app.listen(PORT, () => {
-    console.log(`✅ Servidor rodando na porta ${PORT}`)
-    console.log(`🗄️  Conectado ao banco de dados: Neon`)
-    console.log(`📍 Acesso em http://localhost:${PORT}`)
+
+async function iniciar() {
+    await pool.inicializarBanco()
+    app.listen(PORT, () => {
+        console.log(`✅ Servidor rodando na porta ${PORT}`)
+        console.log(`🗄️  Banco de dados: tabelas verificadas/criadas`)
+        console.log(`📍 Acesso em http://localhost:${PORT}`)
+    })
+}
+
+iniciar().catch((err) => {
+    console.error('❌ Falha ao iniciar o servidor:', err.message)
+    process.exit(1)
 })

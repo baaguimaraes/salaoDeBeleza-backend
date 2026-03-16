@@ -9,11 +9,7 @@ exports.registrar = async (req, res) => {
         const { nome, email, senha, tipo, telefone } = req.body
         
         if (!nome || !email || !senha || !telefone) {
-<<<<<<< HEAD
             return res.status(400).json({ erro: 'Nome, email, senha e telefone são obrigatórios' })
-=======
-            return res.status(400).json({ erro: 'Nome, email, telefone e senha são obrigatórios' })
->>>>>>> 30bdd757d12a97357a0fc625eca32c8ff1612677
         }
         
         // Verificar se email já existe
@@ -26,13 +22,11 @@ exports.registrar = async (req, res) => {
             return res.status(400).json({ erro: 'Email já cadastrado' })
         }
         
-        // Hash da senha
         const senhaHash = await bcrypt.hash(senha, 10)
         
-        // Inserir como profissional com tipo de usuário
         const resultado = await pool.query(
-            'INSERT INTO profissionais (nome, email, telefone, especialidade) VALUES ($1, $2, $3, $4) RETURNING id, nome, email',
-            [nome, email, telefone, tipo || 'admin']
+            'INSERT INTO profissionais (nome, email, telefone, especialidade, senha) VALUES ($1, $2, $3, $4, $5) RETURNING id, nome, email',
+            [nome, email, telefone, tipo || 'admin', senhaHash]
         )
         
         res.status(201).json({ 
@@ -66,12 +60,15 @@ exports.login = async (req, res) => {
         
         const usuario = resultado.rows[0]
         
- 
-        if (usuario.especialidade !== 'admin' && email !== 'admin@salao.com') {
-            return res.status(401).json({ erro: 'Apenas administradores podem fazer login' })
+        if (!usuario.senha) {
+            return res.status(401).json({ erro: 'Usuário não possui senha cadastrada' })
+        }
+
+        const senhaValida = await bcrypt.compare(senha, usuario.senha)
+        if (!senhaValida) {
+            return res.status(401).json({ erro: 'Email ou senha inválidos' })
         }
         
-        // Gerar JWT
         const token = jwt.sign(
             { 
                 id: usuario.id, 
