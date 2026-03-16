@@ -6,10 +6,10 @@ require('dotenv').config()
 // Registrar novo usuário (opcional - pode ser apenas administrador)
 exports.registrar = async (req, res) => {
     try {
-        const { nome, email, senha, tipo } = req.body
+        const { nome, email, senha, tipo, telefone } = req.body
         
-        if (!nome || !email || !senha) {
-            return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios' })
+        if (!nome || !email || !senha || !telefone) {
+            return res.status(400).json({ erro: 'Nome, email, telefone e senha são obrigatórios' })
         }
         
         // Verificar se email já existe
@@ -27,8 +27,8 @@ exports.registrar = async (req, res) => {
         
         // Inserir como profissional com tipo de usuário
         const resultado = await pool.query(
-            'INSERT INTO profissionais (nome, email, especialidade) VALUES ($1, $2, $3) RETURNING id, nome, email',
-            [nome, email, tipo || 'administrador']
+            'INSERT INTO profissionais (nome, email, telefone, especialidade) VALUES ($1, $2, $3, $4) RETURNING id, nome, email',
+            [nome, email, telefone, tipo || 'admin']
         )
         
         res.status(201).json({ 

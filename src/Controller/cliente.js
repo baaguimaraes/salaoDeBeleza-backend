@@ -27,23 +27,23 @@ exports.buscarClientePorId = async (req, res) => {
 }
 exports.criarCliente = async (req, res) => {
     try {
-        const {nome, email, telefone, senha} = req.body
-        if(!nome || !email || !telefone || !senha) {
-            return res.status(400).json({ erro: 'Todos os campos são obrigatórios' })
+        const { nome, email, telefone, cpf, endereco } = req.body
+        if (!nome || !email || !telefone) {
+            return res.status(400).json({ erro: 'Nome, email e telefone são obrigatórios' })
         }
-        const resultadi = await pool.query('INSERT INTO clientes (nome, email, telefone, senha) VALUES ($1, $2, $3, $4) RETURNING id',
-        [nome, email, telefone, await bcrypt.hash(senha, 10)])
-        res.status(201).json({ mensagem: 'Cliente criado com sucesso', clienteId: resultado.rows[0] 
-
-        })
-     } catch (error) {
-            console.error(error)
-            if (error.code === '23505') { 
-                return res.status(400).json({ erro: 'Email já cadastrado' })
-            }
-            res.status(500).json({ erro: 'Erro ao criar cliente' })
+        const resultado = await pool.query(
+            'INSERT INTO clientes (nome, email, telefone, cpf, endereco) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [nome, email, telefone, cpf || null, endereco || null]
+        )
+        res.status(201).json({ mensagem: 'Cliente criado com sucesso', clienteId: resultado.rows[0].id })
+    } catch (error) {
+        console.error(error)
+        if (error.code === '23505') {
+            return res.status(400).json({ erro: 'Email ou CPF já cadastrado' })
         }
+        res.status(500).json({ erro: 'Erro ao criar cliente' })
     }
+}
     
  exports.atualizarCliente = async (req, res) => {
     try {
