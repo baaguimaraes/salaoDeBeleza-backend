@@ -26,7 +26,31 @@ exports.buscarClientePorId = async (req, res) => {
 }
 exports.criarCliente = async (req, res) => {
     try {
+<<<<<<< HEAD
         console
+=======
+        const { nome, email, telefone, cpf, endereco } = req.body
+        if (!nome || !email || !telefone) {
+            return res.status(400).json({ erro: 'Nome, email e telefone são obrigatórios' })
+        }
+        const resultado = await pool.query(
+            'INSERT INTO clientes (nome, email, telefone, cpf, endereco) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [nome, email, telefone, cpf || null, endereco || null]
+        )
+        res.status(201).json({ mensagem: 'Cliente criado com sucesso', clienteId: resultado.rows[0].id })
+    } catch (error) {
+        console.error(error)
+        if (error.code === '23505') {
+            return res.status(400).json({ erro: 'Email ou CPF já cadastrado' })
+        }
+        res.status(500).json({ erro: 'Erro ao criar cliente' })
+    }
+}
+    
+ exports.atualizarCliente = async (req, res) => {
+    try {
+        const { id } = req.params
+>>>>>>> 30bdd757d12a97357a0fc625eca32c8ff1612677
         const { nome, email, telefone, cpf, endereco } = req.body
         if (!nome || !email || !telefone) {
             return res.status(400).json({ erro: 'Nome, email e telefone são obrigatórios' })

@@ -9,7 +9,11 @@ exports.registrar = async (req, res) => {
         const { nome, email, senha, tipo, telefone } = req.body
         
         if (!nome || !email || !senha || !telefone) {
+<<<<<<< HEAD
             return res.status(400).json({ erro: 'Nome, email, senha e telefone são obrigatórios' })
+=======
+            return res.status(400).json({ erro: 'Nome, email, telefone e senha são obrigatórios' })
+>>>>>>> 30bdd757d12a97357a0fc625eca32c8ff1612677
         }
         
         // Verificar se email já existe
