@@ -15,6 +15,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.post('/auth/registrar', authController.registrar)
 app.post('/auth/login', authController.login)
 app.post('/auth/perfil', authController.verificarToken, authController.obterPerfil)
 app.get('/clientes', clienteController.listarClientes)
